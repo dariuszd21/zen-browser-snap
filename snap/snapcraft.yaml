@@ -8,11 +8,12 @@ description: |
   we live in tweetspace and your description wants to look good in the snap
   store.
 
-grade: devel # must be 'stable' to release into candidate/stable channels
+grade: devel
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
 parts:
   zen-browser:
     source: https://github.com/zen-browser/desktop/releases/download/${CRAFT_PROJECT_VERSION}/zen.linux-specific.tar.bz2
-    # See 'snapcraft plugins'
     plugin: dump
+    build-attributes:
+    - enable-patchelf
