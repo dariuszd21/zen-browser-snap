@@ -39,8 +39,6 @@ apps:
       - audio-record
       - avahi-observe
       - browser-sandbox
-      - dot-gtk3
-      - dot-zen
       - camera
       - cups-control
       - gsettings
@@ -62,14 +60,6 @@ plugs:
   browser-sandbox:
     interface: browser-support
     allow-sandbox: true
-
-  dot-gtk3:
-    interface: personal-files
-    read: [$HOME/.config/gtk-3.0]
-
-  dot-zen:
-    interface: personal-files
-    write: [$HOME/.zen]
 
   gpu-2404:
     interface: content
