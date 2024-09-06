@@ -14,14 +14,13 @@ compression: lzo
 
 apps:
   zen-browser:
+    command-chain:
+      - bin/gpu-2404-wrapper
     command: zen
     extensions: [gnome]
     environment:
       GTK_USE_PORTAL: 1
       HOME: "$SNAP_USER_COMMON"
-      PIPEWIRE_CONFIG_NAME: "$SNAP/usr/share/pipewire/pipewire.conf"
-      PIPEWIRE_MODULE_DIR: "$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/pipewire-0.3"
-      SPA_PLUGIN_DIR: "$SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/spa-0.2"
     slots:
       - dbus-daemon
       - mpris
@@ -57,6 +56,11 @@ plugs:
     interface: personal-files
     read: [$HOME/.zen]
 
+  gpu-2404:
+    interface: content
+    target: $SNAP/gpu-2404
+    default-provider: mesa-2404
+
 slots:
   dbus-daemon:
     interface: dbus
@@ -64,25 +68,30 @@ slots:
     name: org.mozilla.firefox
 
 layout:
-  /usr/share/libdrm:
-    bind: $SNAP/usr/share/libdrm
   /usr/share/alsa:
     bind: $SNAP/usr/share/alsa
+  /usr/share/libdrm:
+    bind: $SNAP/gpu-2404/libdrm
+  /usr/share/drirc.d:
+    symlink: $SNAP/gpu-2404/drirc.d
 
 parts:
   zen-browser:
-    source: https://github.com/zen-browser/desktop/releases/download/${CRAFT_PROJECT_VERSION}/zen.linux-specific.tar.bz2
+    source: https://github.com/zen-browser/desktop/releases/download/$CRAFT_PROJECT_VERSION/zen.linux-specific.tar.bz2
     plugin: dump
     build-attributes:
     - enable-patchelf
     stage-packages:
-      - libcurl4
-      - libdrm-common
-      - libpci3
-      - libpipewire-0.3-0
-      - libpipewire-0.3-modules
-      - libvulkan1
-      - libxt6
-      - mesa-vulkan-drivers
-      - pipewire-bin
-      - pipewire-pulse
+      - libfontconfig1
+      - libpangoft2-1.0-0
+      - libxfixes3
+      - libxrender1
+  gpu-2404:
+    after: [zen-browser]
+    source: https://github.com/canonical/gpu-snap.git
+    plugin: dump
+    override-prime: |
+      craftctl default
+      ${CRAFT_PART_SRC}/bin/gpu-2404-cleanup mesa-2404
+    prime:
+    - bin/gpu-2404-wrapper
