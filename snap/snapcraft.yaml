@@ -1,15 +1,24 @@
 name: zen-browser
 base: core24
 version: '1.0.0-a.37'
-summary: Single-line elevator pitch for your amazing snap # 79 char long summary
+summary: Zen is the best way to browse the web.
 description: |
-  This is my-snap's description. You have a paragraph or two to tell the
-  most important story about your snap. Keep it under 100 words though,
-  we live in tweetspace and your description wants to look good in the snap
-  store.
+  This is an unofficial snap package of Zen browser
+
+  Zen - Your Browser, your way
+
+  Experience tranquility while browsing the internet
+  with Zen! Our mission is to give you a perfect
+  balance for speed, privacy and productivity
+
+  Zen thrives on the contributions of its vibrant community.
+  As an open-source project, Zen encourages collaboration
+  and innovation, allowing users and developers alike to
+  shape the future of the browser.
+
 
 grade: stable
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: strict
 compression: lzo
 
 apps:
@@ -20,7 +29,7 @@ apps:
     extensions: [gnome]
     environment:
       GTK_USE_PORTAL: 1
-      HOME: "$SNAP_USER_COMMON"
+      HOME: "$SNAP_USER_DATA"
     slots:
       - dbus-daemon
       - mpris
@@ -30,6 +39,8 @@ apps:
       - audio-record
       - avahi-observe
       - browser-sandbox
+      - dot-gtk3
+      - dot-zen
       - camera
       - cups-control
       - gsettings
@@ -52,9 +63,13 @@ plugs:
     interface: browser-support
     allow-sandbox: true
 
+  dot-gtk3:
+    interface: personal-files
+    read: [$HOME/.config/gtk-3.0]
+
   dot-zen:
     interface: personal-files
-    read: [$HOME/.zen]
+    write: [$HOME/.zen]
 
   gpu-2404:
     interface: content
@@ -84,8 +99,21 @@ parts:
     stage-packages:
       - libfontconfig1
       - libpangoft2-1.0-0
+      - libpci3
       - libxfixes3
       - libxrender1
+    override-build: |
+      craftctl default
+      DESKTOP_DIRECTORY_PATH="${CRAFT_PART_INSTALL}/snap/gui"
+      ICON_PATH="${DESKTOP_DIRECTORY_PATH}/zen-browser.png"
+
+      mkdir -p "${DESKTOP_DIRECTORY_PATH}"
+      cp ${CRAFT_PART_SRC}/browser/chrome/icons/default/default48.png "${ICON_PATH}"
+      echo "Exec=zen-browser" > "${DESKTOP_DIRECTORY_PATH}/zen-browser.desktop"
+      echo "Icon=${SNAP}/meta/gui/zen-browser.png" >> "${DESKTOP_DIRECTORY_PATH}/zen-browser.desktop"
+
+
+
   gpu-2404:
     after: [zen-browser]
     source: https://github.com/canonical/gpu-snap.git
